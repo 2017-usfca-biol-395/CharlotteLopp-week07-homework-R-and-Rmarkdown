@@ -1,13 +1,14 @@
 ---
 title: "Analysis of BLAST Results"
-author: "Don Francisco"
-date: "October 6, 2017"
+author: "Charlotte Lopp"
+date: "October 9, 2017"
 output: github_document
 ---
 
 # Introduction
 
-Add 1-2 paragraphs here.
+  It has been established that the diversity of skin-associated bacterial communities has a high enough degree of individual variability that the composition of these communities can be used in forensic indentification. These communities are personaly unique, temporally stable, and transferable. Fierer et al. hypothesized, based on this personalized aspect of skin bacterial communities, that they could use the residual skin bacterial left on objects as "fingerprints" to identify the individual who had touched the object. They proposed to do this by matching the bacteria on the object to the skin-associated bacteria of the individual. In order to perform this matching, three criteria must be met: (1) bacterial DNA recovered from touched surfaces allows for adequate characterization and comparison of bacterial communities; (2) skin bacterial communities persist on surfaces for days to weeks; and (3) surfaces that are touched can be effectively linked to individuals by assessing the degree of similarity between the bacterial communities on the object and the skin of the individual who touched the object. 
+  In order to meet these criteria and demonstrate the potential of this approach for forensic identification, three interralted studies were carried out that combined phylogenetic community analyses and high-thorughput pyrosequencing methods. The first experiment entailed comparing bacterial communities on individual keys of three computer keyboards to the communities found on the fingers of the keyboard owners. In the second, the similarity between skin-associated bacterial communities on object stored at -20 degrees Celcius versus those objects stored under typical indoor environmental conditions for up to 14 days were examined. For the third experiment, objects were linked to specific individuals based on comparison of the bacteria on their computer mice to the database containing community information for more than 250 band surfaces, including the hand of the owner. What Fierer et al. discovered was that skin-associated bacteria can be readily recovered from surfaces and that the composition of these communities can indeed be used to determine which individuals touched which objects. This could be determined even if the surfaces had been untouched for up to 2 weeks at room temperature. They demonstrated the utility of a high-throughput pyrosequencing-based approach to quantitatively compare the bacterial communities on objects and skin to match the object to the individual with a high degree of certainty. 
 
 # Methods
 
