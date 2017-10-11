@@ -7,18 +7,19 @@ output: github_document
 
 # Introduction
 
-  It has been established that the diversity of skin-associated bacterial communities has a high enough degree of individual variability that the composition of these communities can be used in forensic indentification. These communities are personaly unique, temporally stable, and transferable. Fierer et al. hypothesized, based on this personalized aspect of skin bacterial communities, that they could use the residual skin bacterial left on objects as "fingerprints" to identify the individual who had touched the object. They proposed to do this by matching the bacteria on the object to the skin-associated bacteria of the individual. In order to perform this matching, three criteria must be met: (1) bacterial DNA recovered from touched surfaces allows for adequate characterization and comparison of bacterial communities; (2) skin bacterial communities persist on surfaces for days to weeks; and (3) surfaces that are touched can be effectively linked to individuals by assessing the degree of similarity between the bacterial communities on the object and the skin of the individual who touched the object. 
+  It has been established that the diversity of skin-associated bacterial communities has a high enough degree of individual variability that the composition of these communities can be used in forensic indentification. These communities are personaly unique, temporally stable, and transferable. Fierer et al. hypothesized, based on this personalized aspect of skin bacterial communities, that they could use the residual skin bacterial left on objects as "fingerprints" to identify the individual who had touched the object. They proposed to do this by matching the bacteria on the object to the skin-associated bacteria of the individual. In order to perform this matching, three criteria must be met: (1) bacterial DNA recovered from touched surfaces allows for adequate characterization and comparison of bacterial communities; (2) skin bacterial communities persist on surfaces for days to weeks; and (3) surfaces that are touched can be effectively linked to individuals by assessing the degree of similarity between the bacterial communities on the object and the skin of the individual who touched the object.  
   In order to meet these criteria and demonstrate the potential of this approach for forensic identification, three interralted studies were carried out that combined phylogenetic community analyses and high-thorughput pyrosequencing methods. The first experiment entailed comparing bacterial communities on individual keys of three computer keyboards to the communities found on the fingers of the keyboard owners. In the second, the similarity between skin-associated bacterial communities on object stored at -20 degrees Celcius versus those objects stored under typical indoor environmental conditions for up to 14 days were examined. For the third experiment, objects were linked to specific individuals based on comparison of the bacteria on their computer mice to the database containing community information for more than 250 band surfaces, including the hand of the owner. What Fierer et al. discovered was that skin-associated bacteria can be readily recovered from surfaces and that the composition of these communities can indeed be used to determine which individuals touched which objects. This could be determined even if the surfaces had been untouched for up to 2 weeks at room temperature. They demonstrated the utility of a high-throughput pyrosequencing-based approach to quantitatively compare the bacterial communities on objects and skin to match the object to the individual with a high degree of certainty. 
 
 # Methods
 
 ## Sample origin and sequencing
 
-Add about a paragraph here.
+  To obtain data for the keyboard study, about 30 individuals keys of three personal computer keyboards and each fingertip of the owner was swabbed. In order to compare the bacterial communities on the keyboards to other miscellaneous keyboards, space bar keys from 15 other private and public computer keyboards were also swabbed. For the storage study, armput skin was simultaneously swabbed with 16 moistened swabs for each of the two individuals. Half of these swabs were immediately frozen at -20 degrees Celsius while the other half was left at room temperature. To gather data for the computer mouse study, the entire exposed face of each computer mouse and the palm surface of nine individual's dominant hands were swabbed. It was important that the mouse had last been touched by the owner 12 hours before swabbing. Fierer et al. estimated the accuracy of matching the house to the owner of the mouse by measuring the degree of similarity between bacterial communities on each computer mouse to the hands of the mouse's owner and to the hands that had never touched the mouse.  
+  Genomic DNA was extracted from the swabs using the MO BIO PowerSoil DNA Isolation kit. For each sample, 16S rRNA genes were amplified using the primer set (detailed in "The influence of sex, handedness, and washing on the diversity of hand surface bacteria" by Fierer et al. (2008)) that had been optimized for the phylogenetic analysis of pyrosequencing reads. PCR reactions followed by thermal cycling and aplicon cleaning using UltraClean-htp96-well PCR Clean-up kit (MO BIO) were conducted. Amplicon DNA concentrations were measured using the Quant-it PicoGreen dsDNA reagent and kit (Invitrogen). Pyrosequencing was carried out on a 454 Life Sciences Genome Sequencer FLX instrument (Roche) by the Environmental Genomics Core Facility at the University of South Carolina. 
 
 ## Computational
 
-And another paragraph or two here.
+  
 
 # Results
 
@@ -31,6 +32,7 @@ And another paragraph or two here.
 library("dplyr")
 library("tidyr")
 library("knitr")
+library("ggplot2")
 ```
 
 ```{r make-read-in-data-function}
@@ -128,12 +130,30 @@ joined_blast_data_metadata <- metadata_in %>%
 # from the data to make a histogram. We don't need to tell the hist() function
 # which data to use, because that's piped in, but we do have to give the
 # hist() function the title and axis label we'd like to use for the figure
+library("ggthemes")
 joined_blast_data_metadata %>%
   filter(env_material_s == "sebum") %>%
-  pull(pident) %>%
-  hist(main = "Percent Identity",
-       xlab = "Percent")
+  filter(length > 200) %>%
+  ggplot(aes(x = length)) + 
+    geom_histogram(color = "light blue",
+                   fill = "light blue") +
+    ggtitle("Length histogram") +
+    ylab("Frequency") +
+    xlab("Sequence length in bp") +
+    theme_classic()
 ```
+
+```
+**Table 1:** Mean sequence lengths for different genders and substrates.
+```
+
+```{r intro-to-ggplot}
+ggplot(joined_blast_data_metadata,
+    aes(x = sex_s,
+        y = length)) +
+  geom_jitter(aes(alpha = pident,
+                  color = sample_type_s))
+```   
 
 Don't forget to report what your figures show in words, here in the Results section.
 
