@@ -24,7 +24,22 @@ Computational
 Results
 =======
 
+``` r
+# Be sure to install these packages before running this script
+# They can be installed either with the intall.packages() function
+# or with the 'Packages' pane in RStudio
+
+# load packages
+library("dplyr")
+```
+
     ## Warning: package 'dplyr' was built under R version 3.4.2
+
+``` r
+library("tidyr")
+library("knitr")
+library("ggplot2")
+```
 
 ``` r
 # Output format from BLAST is as detailed on:
@@ -114,28 +129,60 @@ joined_blast_data_metadata <- metadata_in %>%
             by = c("Run_s" = "sample_name"))
 ```
 
+### Table of top 10 occurring organisms on female hands.
+
 ``` r
 # Here we're using the dply piping syntax to select a subset of rows matching a
 # criteria we specify (using the filter) function, and then pull out a column
 # from the data to make a histogram. We don't need to tell the hist() function
 # which data to use, because that's piped in, but we do have to give the
 # hist() function the title and axis label we'd like to use for the figure
-library("ggthemes")
+library("dplyr")
 joined_blast_data_metadata %>%
-  filter(env_material_s == "sebum") %>%
-  filter(length > 200) %>%
-  ggplot(aes(x = length)) + 
-    geom_histogram(color = "light blue",
-                   fill = "light blue") +
-    ggtitle("Length histogram") +
-    ylab("Frequency") +
-    xlab("Sequence length in bp") +
-    theme_classic()
+    filter(sex_s == "female") %>%
+    group_by(sscinames) %>%
+    count() %>%
+    arrange(desc(n)) %>%
+    head(10) %>%
+    kable()
 ```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+| sscinames                            |    n|
+|:-------------------------------------|----:|
+| Bartonella washoensis                |  678|
+| Acidovorax sp.                       |  173|
+| unidentified bacterium               |   85|
+| Lupinus angustiflorus                |   76|
+| Methylophilus quaylei                |   55|
+| Propionibacterium acnes subsp. acnes |   36|
+| Cloacibacterium normanense           |   33|
+| Diaphorobacter sp.                   |   29|
+| Streptomyces sp.                     |   19|
+| Mycobacterium tusciae JS617          |   18|
 
-![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histograms-1.png)
+``` r
+library("dplyr")
+joined_blast_data_metadata %>%
+    filter(sex_s == "male") %>%
+    group_by(sscinames) %>%
+    count() %>%
+    arrange(desc(n)) %>%
+    head(10) %>%
+    kable()
+```
+
+| sscinames                                 |     n|
+|:------------------------------------------|-----:|
+| Solemya pervernicosa gill symbiont        |  1549|
+| Aquitalea sp. KJ011                       |   500|
+| Acidovorax sp.                            |   170|
+| Pinus oocarpa                             |   127|
+| Acinetobacter junii                       |   117|
+| Staphylococcus succinus                   |   104|
+| unidentified bacterium                    |    93|
+| Cardiobacterium sp. feline oral taxon 346 |    68|
+| Gulbenkiania sp.                          |    68|
+| Acinetobacter indicus                     |    51|
 
     **Table 1:** Mean sequence lengths for different genders and substrates.
 
