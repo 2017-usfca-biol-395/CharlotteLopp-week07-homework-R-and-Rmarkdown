@@ -19,7 +19,7 @@ output: github_document
 
 ## Computational
 
-  Computation with this data began with creating a bashscript with code which downloaded the list of files (from the NCBI Sequence Read Archive study number ERP022657) in the run table to the project's data directory. Code was then written to create QC reports for each of the runs using the FastQC programan and then trimmed the sequences based on their quality scores (any sequences below the length of 150 base pairs and any base score below 25 was discarded). Then the bascript converted fastq files into fasta files so that they could be used in BLAST queries. Finally, each sequence was blasted with the result output into a csv file. These BLAST results are what are now being used for this R-scripted analysis. 
+  Computation with this data began with creating a bashscript with code which downloaded the list of 20 files (from the NCBI Sequence Read Archive study number ERP022657) in the run table to the project's data directory. Code was then written to create QC reports for each of the runs using the FastQC program. These 20 sequences were then trimmed based on their quality scores (any sequences below the length of 150 base pairs and any base score below 25 was discarded). The bascript proceeded with code which converted fastq files into fasta files so that they could be used in BLAST queries. Finally, each sequence was blasted with the output written into a csv file; "blastn" was used to search for the top match of each sequence against the *nt* database. These BLAST results are what are now being used for this R-scripted analysis. As the blasting took tens of hours, this session was made sure to be written in a tmux session for the online server. 
 
 # Results
 
@@ -131,6 +131,7 @@ joined_blast_data_metadata <- metadata_in %>%
 # hist() function the title and axis label we'd like to use for the figure
 library("dplyr")
 joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
     filter(sex_s == "female") %>%
     group_by(sscinames) %>%
     count() %>%
@@ -142,16 +143,49 @@ joined_blast_data_metadata %>%
 ```{r histogram 2}
 library("dplyr")
 joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
     filter(sex_s == "male") %>%
     group_by(sscinames) %>%
     count() %>%
     arrange(desc(n)) %>%
     head(10) %>%
     kable()
+      
 ```
 
+```{r histogram 3}
+library("dplyr")
+joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
+    filter(sex_s == "male") %>%
+    group_by(length) %>%
+    ggplot(aes(x = length)) + 
+      geom_histogram(color = "gray") +
+      theme_classic() +
+      ggtitle("Length Histogram for Male and Sebum")
 ```
-**Table 1:** Mean sequence lengths for different genders and substrates.
+
+This histogram is based on data filtered first by env_material_s "sebum" and then by sex_s "male." What is shown here is a spike in the number of sequences that have a length of just above 150 base pairs. The rest of data is mostly seen in the range between 175-230. 
+
+```{r histogram 4}
+joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
+    filter(sex_s == "female") %>%
+    group_by(length) %>%
+    ggplot(aes(x = length)) + 
+      geom_histogram(color = "gray") +
+      theme_classic() + 
+      ggtitle("Length Histogram for Female and Sebum")
+```
+
+This histogram is based on data filtered first by env_material_s "sebum" and then by sex_s "female." What is shown here is a spike in the number of sequences that have a length of just around 225 base pairs. This spike falls within the rest of the data, creating the expected bell curve. Most of the data is within 175-250. 
+
+```{r intro-to-ggplot}
+ggplot(joined_blast_data_metadata,
+ aes(x = length,
+ fill = sample_type_s)) +
+ geom_density(alpha = 0.5) +
+ facet_grid(host_subject_id_s ~ sex_s)
 ```
 
 
@@ -161,10 +195,11 @@ ggplot(joined_blast_data_metadata,
     aes(x = sex_s,
         y = length)) +
   geom_jitter(aes(alpha = pident,
-                  color = sample_type_s))
+                  color = sample_type_s)) +
+  ggtitle("Pident Scatterplot Across All Sample Types")
 ```   
 
-Don't forget to report what your figures show in words, here in the Results section.
+This scatterplot is based on pident scores (the percentage of identical matches) for sequence length for all sample types: male, female, not applicable (computer mice). It accounts for pident scores ranging from 85-100%. The strongest scores for females is predominantly between the 200-250 range; the strongest scores for males is just split with a 100 score at just above 150 and then close clustering between about 210-240. The computer mice pident scores reflect the strongest score in males at just above 150 and then the strongest range of scores seen in both sexes between 175 and 250. 
 
 ```{r summary-table}
 # Finally, we'd like to be able to make a summary table of the counts of
