@@ -21,6 +21,8 @@ Genomic DNA was extracted from the swabs using the MO BIO PowerSoil DNA Isolatio
 Computational
 -------------
 
+Computation with this data began with creating a bashscript with code which downloaded the list of 20 files (from the NCBI Sequence Read Archive study number ERP022657) in the run table to the project's data directory. Code was then written to create QC reports for each of the runs using the FastQC program. These 20 sequences were then trimmed based on their quality scores (any sequences below the length of 150 base pairs and any base score below 25 was discarded). The bascript proceeded with code which converted fastq files into fasta files so that they could be used in BLAST queries. Finally, each sequence was blasted with the output written into a csv file; "blastn" was used to search for the top match of each sequence against the *nt* database. These BLAST results are what are now being used for this R-scripted analysis. As the blasting took tens of hours, this session was made sure to be written in a tmux session for the online server.
+
 Results
 =======
 
@@ -129,8 +131,6 @@ joined_blast_data_metadata <- metadata_in %>%
             by = c("Run_s" = "sample_name"))
 ```
 
-### Table of top 10 occurring organisms on female hands.
-
 ``` r
 # Here we're using the dply piping syntax to select a subset of rows matching a
 # criteria we specify (using the filter) function, and then pull out a column
@@ -139,6 +139,7 @@ joined_blast_data_metadata <- metadata_in %>%
 # hist() function the title and axis label we'd like to use for the figure
 library("dplyr")
 joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
     filter(sex_s == "female") %>%
     group_by(sscinames) %>%
     count() %>%
@@ -163,6 +164,7 @@ joined_blast_data_metadata %>%
 ``` r
 library("dplyr")
 joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
     filter(sex_s == "male") %>%
     group_by(sscinames) %>%
     count() %>%
@@ -184,19 +186,65 @@ joined_blast_data_metadata %>%
 | Gulbenkiania sp.                          |    68|
 | Acinetobacter indicus                     |    51|
 
-    **Table 1:** Mean sequence lengths for different genders and substrates.
+``` r
+library("dplyr")
+joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
+    filter(sex_s == "male") %>%
+    group_by(length) %>%
+    ggplot(aes(x = length)) + 
+      geom_histogram(color = "gray") +
+      theme_classic() +
+      ggtitle("Length Histogram for Male and Sebum")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histogram%203-1.png)
+
+This histogram is based on data filtered first by env\_material\_s "sebum" and then by sex\_s "male." What is shown here is a spike in the number of sequences that have a length of just above 150 base pairs. The rest of data is mostly seen in the range between 175-230.
+
+``` r
+joined_blast_data_metadata %>%
+    filter(env_material_s == "sebum") %>%
+    filter(sex_s == "female") %>%
+    group_by(length) %>%
+    ggplot(aes(x = length)) + 
+      geom_histogram(color = "gray") +
+      theme_classic() + 
+      ggtitle("Length Histogram for Female and Sebum")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/histogram%204-1.png)
+
+This histogram is based on data filtered first by env\_material\_s "sebum" and then by sex\_s "female." What is shown here is a spike in the number of sequences that have a length of just around 225 base pairs. This spike falls within the rest of the data, creating the expected bell curve. Most of the data is within 175-250.
+
+``` r
+ggplot(joined_blast_data_metadata,
+ aes(x = length,
+ fill = sample_type_s)) +
+ geom_density(alpha = 0.5) +
+ facet_grid(host_subject_id_s ~ sex_s)
+```
+
+![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/scatterplot-1.png)
+
+This grid of charts shows that in female participants, the greatest density is seen in sequence length of around 225. The strongest spikes are in subjects F5, F6 and F7 but only barely discernable bumps are seen in F2 and F8. In male participants, the greatest density in terms of highest discernable peak is seen in M2 around 225. The only other one that shows the slighest peak at 225 is M9 which also has a peak at just above 150 base pairs. M1, M7 and M8 present peaks at just above 150 base pairs. The computer mouse sample type shows substantially higher peaks at around 225 base pairs in F2, F8 and M2. THe rest of the peaks are only slight.
 
 ``` r
 ggplot(joined_blast_data_metadata,
     aes(x = sex_s,
         y = length)) +
   geom_jitter(aes(alpha = pident,
-                  color = sample_type_s))
+                  color = sample_type_s)) +
+  ggtitle("Pident Scatterplot Across All Sample Types")
 ```
 
 ![](Analysis_of_BLAST_Results_files/figure-markdown_github-ascii_identifiers/intro-to-ggplot-1.png)
 
-Don't forget to report what your figures show in words, here in the Results section.
+This scatterplot is based on pident scores (the percentage of identical matches) for sequence length for all sample types: male, female, not applicable (computer mice). It accounts for pident scores ranging from 85-100%. The strongest scores for females is predominantly between the 200-250 range; the strongest scores for males is just split with a 100 score at just above 150 and then close clustering between about 210-240. The computer mice pident scores reflect the strongest score in males at just above 150 and then the strongest range of scores seen in both sexes between 175 and 250.
 
 ``` r
 # Finally, we'd like to be able to make a summary table of the counts of
@@ -1306,4 +1354,5 @@ kable(table(joined_blast_data_metadata$sscinames,
 Discussion
 ==========
 
-Add 2-3 paragraphs here interpreting your results and considering future directions one might take in analyzing these data.
+It is interesting to note that the top 10 occurring organisms when compared between male and female palms are considerably different. They in fact only share two: unidentified bacterium and Acridovorax sp. The difference between abundance is also quite distinguishable; for males, Bartonella washoensis’ n is 678 base pairs long while for females, Solemya pervernicosa gill symbiont is 1549. Bartonella washoensis is a bacterium from the genus of Bartonella which was first isolated from a dog with mitral valve endocarditis. It can infect squirrels but can also cause meningitis in humans. According to study Isolation of Bartonella washoensis from a dog with mitral valve endocarditis the main reservoir species for Bartonella washoensis is ground squirrels (Spemophilus beecheyi) from the western United States. Pathologies included progressions from a heart murmur to progressive dyspnea to a diagnosis of congestive heart failure to death a month after the initial presentation. Solemya pervernicosa is one of the 19 species within the genus Solemya, which is a genus of saltwater clams - specifically the awning clams. These clams have chemosynthetic bacterial symbionts that produce their food. These bacteria live within their gill cells and produce energy by oxidizing hydrogen sulfide, which they proceed to use in fixing carbon dioxide via the Calvin cycle. It would be interesting to see why there these, along with some of the other top occurring organisms, appeared on these palms (particularly clams).
+In the histogram of sequence length for filters of male and sebum, you can see that the highest count is for a length just in just above 150 base pairs. The rest of the count is seen in the range from 175-230. I would guess that this is accounted for by Bartonella washoensis. For the histogram of sequence length for filters of female and sebum, there is a bell curve with the pinnacle being at around the sequence length of 225. The rest of the data is spread around this peak in a range from 175-250. The third grid shows the right palm data for both the female and male sample types and then the computer mouse data for the not applicable (sex) sample type. It is interesting to note the significant peaks seen in F2, F8 and M2 as the magnitude of these peaks are not seen in any of the other mini graphs; the reason as to why these peaks were recorded would be a great avenue to pursue. The scatterplot shows the sequence length but with pident scores (the percentage of identical matches). You can see that for males, the strongest scores are for just above 150 base pairs while for females, the strongest scores are between 200-250. The computer mouse pident scores are strongest at the just above 150 mark and then from about 175-250 accounting for the strength in scores for both sexes.

@@ -180,7 +180,7 @@ joined_blast_data_metadata %>%
 
 This histogram is based on data filtered first by env_material_s "sebum" and then by sex_s "female." What is shown here is a spike in the number of sequences that have a length of just around 225 base pairs. This spike falls within the rest of the data, creating the expected bell curve. Most of the data is within 175-250. 
 
-```{r intro-to-ggplot}
+```{r scatterplot}
 ggplot(joined_blast_data_metadata,
  aes(x = length,
  fill = sample_type_s)) +
@@ -188,7 +188,7 @@ ggplot(joined_blast_data_metadata,
  facet_grid(host_subject_id_s ~ sex_s)
 ```
 
-
+This grid of charts shows that in female participants, the greatest density is seen in sequence length of around 225. The strongest spikes are in subjects F5, F6 and F7 but only barely discernable bumps are seen in F2 and F8. In male participants, the greatest density in terms of highest discernable peak is seen in M2 around 225. The only other one that shows the slighest peak at 225 is M9 which also has a peak at just above 150 base pairs. M1, M7 and M8 present peaks at just above 150 base pairs. The computer mouse sample type shows substantially higher peaks at around 225 base pairs in F2, F8 and M2. THe rest of the peaks are only slight. 
 
 ```{r intro-to-ggplot}
 ggplot(joined_blast_data_metadata,
@@ -212,5 +212,6 @@ kable(table(joined_blast_data_metadata$sscinames,
 
 # Discussion
 
-Add 2-3 paragraphs here interpreting your results and considering future directions one might take in analyzing these data.
+It is interesting to note that the top 10 occurring organisms when compared between male and female palms are considerably different. They in fact only share two: unidentified bacterium and Acridovorax sp. The difference between abundance is also quite distinguishable; for males, Bartonella washoensis’ n is 678 base pairs long while for females, Solemya pervernicosa gill symbiont is 1549. Bartonella washoensis is a bacterium from the genus of Bartonella which was first isolated from a dog with mitral valve endocarditis. It can infect squirrels but can also cause meningitis in humans. According to study Isolation of Bartonella washoensis from a dog with mitral valve endocarditis the main reservoir species for Bartonella washoensis is ground squirrels (Spemophilus beecheyi) from the western United States. Pathologies included progressions from a heart murmur to progressive dyspnea to a diagnosis of congestive heart failure to death a month after the initial presentation. Solemya pervernicosa is one of the 19 species within the genus Solemya, which is a genus of saltwater clams - specifically the awning clams. These clams have chemosynthetic bacterial symbionts that produce their food. These bacteria live within their gill cells and produce energy by oxidizing hydrogen sulfide, which they proceed to use in fixing carbon dioxide via the Calvin cycle. It would be interesting to see why there these, along with some of the other top occurring organisms, appeared on these palms (particularly clams).  
+	In the histogram of sequence length for filters of male and sebum, you can see that the highest count is for a length just in just above 150 base pairs. The rest of the count is seen in the range from 175-230. I would guess that this is accounted for by Bartonella washoensis. For the histogram of sequence length for filters of female and sebum, there is a bell curve with the pinnacle being at around the sequence length of 225. The rest of the data is spread around this peak in a range from 175-250. The third grid shows the right palm data for both the female and male sample types and then the computer mouse data for the not applicable (sex) sample type. It is interesting to note the significant peaks seen in F2, F8 and M2 as the magnitude of these peaks are not seen in any of the other mini graphs; the reason as to why these peaks were recorded would be a great avenue to pursue. The scatterplot shows the sequence length but with pident scores (the percentage of identical matches). You can see that for males, the strongest scores are for just above 150 base pairs while for females, the strongest scores are between 200-250. The computer mouse pident scores are strongest at the just above 150 mark and then from about 175-250 accounting for the strength in scores for both sexes. 
 
